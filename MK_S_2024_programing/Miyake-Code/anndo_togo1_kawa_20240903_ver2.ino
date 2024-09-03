@@ -148,16 +148,23 @@ void setup()
   // Use 1st timer of 4 (counted from zero).
   // Set 80 divider for prescaler (see ESP32 Technical Reference Manual for more
   // info).
-  timer = timerBegin(1000000);
+  //timer = timerBegin(1000000);
+ // 川村変更点
+ //タイマーの初期化
+  timer = timerBegin(0, 80, true); // タイマーインデックス 0、プリスケーラ 80 (1usごとに1カウント)、カウンタは増加
+
   //ESP32はタイマーが4つあり、0-3までのタイマーを利用できます。
   //2つ目が何クロックでカウントをするかの数値になります。80の場合、80クロックで1カウントします。
 
   // Attach onTimer function to our timer.
-  timerAttachInterrupt(timer, &onTimer);
+  //timerAttachInterrupt(timer, &onTimer);
+ timerAttachInterrupt(timer, &onTimer, true); // 割り込みを割り当てる
   //最初の引数は設定するタイマー。2つ目は割り込み時に呼ばれる割り込み関数。3つ目が割り込み検知方法です。
   // Set alarm to call onTimer function every second (value in microseconds).
   // Repeat the alarm (third parameter)
-  timerAlarm(timer,10000,true,0);
+  //timerAlarm(timer,10000,true,0);
+ // 10,000カウント後にアラームが発動 (10000us = 10ms)
+  timerAlarmWrite(timer, 10000000, true);
   //割り込みが発生したときの、トリガー条件を設定します。最初の引数は設定するタイマー。2つ目はカウント数。3つ目がautoreloadで、trueの場合には定期実行、falseの場合には1ショットの実行になります。
   //1000000で１秒間隔でカウント
   // Start an alarm
@@ -238,7 +245,14 @@ void loop() {
         delay(1000);
         myServo1.write(60);
         delay(1000);
-  
+
+       
+      for (;;) {
+              digitalWrite(Buzzer, HIGH);
+              delay(1000);
+              //digitalWrite(Buzzer,LOW);
+              //delay(1000);
+            }
         //  myServo1.write(0);
         // delay(1000);
         // myServo1.write(90);
